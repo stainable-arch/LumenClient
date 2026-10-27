@@ -1,0 +1,28 @@
+name: Build jar
+on:
+  push:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Build the mod
+        run: |
+          unzip -q LumenClient-source.zip
+          cd LumenClient
+          wget -q https://services.gradle.org/distributions/gradle-7.6.4-bin.zip
+          unzip -q gradle-7.6.4-bin.zip
+          ./gradle-7.6.4/bin/gradle build --no-daemon --stacktrace
+          ls -la build/libs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LumenClient-jar
+          path: |
+            LumenClient/build/libs/*.jar
+            !LumenClient/build/libs/*-dev.jar
+            !LumenClient/build/libs/*-sources.jar
